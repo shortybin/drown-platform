@@ -1,6 +1,8 @@
 import vue from "@vitejs/plugin-vue";
+import autoprefixer from "autoprefixer";
 import { resolve } from "path";
 import postCssPxToRem from "postcss-pxtorem";
+import tailwindcss from "tailwindcss";
 import AutoImport from "unplugin-auto-import/vite";
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 import Components from "unplugin-vue-components/vite";
@@ -36,6 +38,8 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
+        tailwindcss,
+        autoprefixer,
         postCssPxToRem({
           rootValue: 16,
           propList: ["*", "!border"],

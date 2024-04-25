@@ -6,6 +6,7 @@ import store from "./store";
 //全局样式
 import "./assets/styles/public.css";
 import "./assets/styles/reset.css";
+import "./assets/styles/tailwindcss.css";
 
 import "@utils/flexible";
 
