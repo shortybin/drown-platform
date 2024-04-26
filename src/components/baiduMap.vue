@@ -32,31 +32,29 @@
   </div>
 </template>
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import MainApi from "@api/MainApi";
+import { addOverlay, fenceList } from "@utils/map";
+import { onMounted, ref } from "vue";
 
 const hazardLevelOptions = [
   {
-    value: "1",
-    label: "1",
+    value: 1,
+    label: 1,
   },
   {
-    value: "2",
-    label: "2",
-  },
-  {
-    value: "3",
-    label: "3",
+    value: 2,
+    label: 2,
   },
 ];
 
 const railTypeOptions = [
   {
-    value: "1",
-    label: "外圈",
+    value: 1,
+    label: "内圈",
   },
   {
-    value: "2",
-    label: "内圈",
+    value: 2,
+    label: "外圈",
   },
 ];
 
@@ -77,8 +75,8 @@ const labelOptions = {
   padding: "5px",
 };
 
-const hazardLevel = ref("1");
-const railType = ref("1");
+const hazardLevel = ref(1);
+const railType = ref(1);
 const currentOverlay = ref();
 const overlayList = ref([]);
 
@@ -88,6 +86,7 @@ let drawingManager;
 
 onMounted(() => {
   map = new BMapGL.Map("container");
+  fenceList(map, deleteFence);
   var point = new BMapGL.Point(110.989311, 35.610962);
   map.centerAndZoom(point, 15);
   map.enableScrollWheelZoom(true);
@@ -124,22 +123,47 @@ function draw() {
 
 function save() {
   if (currentOverlay.value) {
-    console.log("保存");
-    console.log(currentOverlay.value.getPath());
-    overlayList.value.push(currentOverlay.value);
-    map.removeOverlay(currentOverlay.value);
+    let params = {
+      inner_or_outer: currentOverlay.value.inner_or_outer,
+      fence_level: currentOverlay.value.fence_level,
+      vertexes: currentOverlay.value.overlay.getPath(),
+      coord_type: "bd09ll",
+    };
 
-    var polygon = new BMapGL.Polygon(currentOverlay.value.getPath(), {strokeColor:"red", strokeWeight:2, strokeOpacity:0.5});
-    map.addOverlay(polygon);  
-
-    currentOverlay.value = null;
+    MainApi.createFence(params)
+      .then((res) => {
+        res.data.vertexes = res.data.vertexes.map((item) => {
+          return new BMapGL.Point(item.lng, item.lat);
+        });
+        overlayList.value.push(res.data);
+        addOverlay(map, res.data, deleteFence);
+        map.removeOverlay(currentOverlay.value.overlay);
+        currentOverlay.value = null;
+      })
+      .finally(() => {
+        drawingManager.close();
+      });
   }
-  drawingManager.close();
 }
 
 function overlaycomplete(e) {
-  currentOverlay.value
-   = e.overlay;
+  currentOverlay.value = {
+    overlay: e.overlay,
+    inner_or_outer: railType.value,
+    fence_level: hazardLevel.value,
+  };
+}
+
+function deleteFence(data, polygon) {
+  ElMessageBox.confirm("确定需要删除此围栏", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    MainApi.deleteFence({ fence_ids: [data.fence_id] }).then((res) => {
+      map.removeOverlay(polygon);
+    });
+  });
 }
 </script>
 <style scoped>

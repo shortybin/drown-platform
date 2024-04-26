@@ -19,6 +19,16 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
+  server: {
+    proxy: {
+      "/api": {
+        // 后台地址
+        target: "http://8.141.1.192:8080/api/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
   resolve: {
     alias: {
       "@assets": resolve(__dirname, "src/assets"),

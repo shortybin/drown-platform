@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { ElMessage as Message } from 'element-plus';
-import { hideLoading, showLoading } from '@utils/loading';
+import { hideLoading, showLoading } from "@utils/loading";
+import axios from "axios";
+import { ElMessage as Message } from "element-plus";
 
 class BaseApi {
   constructor() {
@@ -25,9 +25,9 @@ class BaseApi {
 }
 
 const $http = axios.create({
-  baseURL: '/api',
+  baseURL: "/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 20000,
 });
@@ -54,7 +54,7 @@ $http.interceptors.response.use(
   (response) => {
     hideLoading();
     const resp = response.data; // 后台出错时可能是返回的错误详情字符串, 后端解决
-    if (resp.status) {
+    if (resp.status != 200) {
       if (!(resp instanceof Blob)) {
         errorHandle(resp.status, resp);
         return Promise.reject(resp);
@@ -64,12 +64,12 @@ $http.interceptors.response.use(
   },
   (err) => {
     hideLoading();
-    if (err.message.includes('timeout')) {
-      Message.error('请求超时');
+    if (err.message.includes("timeout")) {
+      Message.error("请求超时");
       return Promise.reject(err.message);
     }
     if (err.response.status === 401) {
-      Message.error('请登录后重试');
+      Message.error("请登录后重试");
       cookie.removeCookies(COOKIE_TOKEN_KEY);
       window.location.reload();
       return;
@@ -86,7 +86,7 @@ $http.interceptors.request.use(
   },
   (error) => {
     hideLoading();
-    console.log('request error', error);
+    console.log("request error", error);
   }
 );
 
@@ -98,7 +98,7 @@ $http.interceptors.request.use(
  * @returns string
  */
 const formatErrMsg = (resp) => {
-  let result = '';
+  let result = "";
 
   if (resp.data.error) {
     result += `${resp.data.error} ; \n`;
