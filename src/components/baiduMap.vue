@@ -81,9 +81,10 @@ const hazardLevel = ref("1");
 const railType = ref("1");
 const currentOverlay = ref();
 const overlayList = ref([]);
-let map = reactive();
+
+let map;
 // 实例化鼠标绘制工具
-let drawingManager = reactive();
+let drawingManager;
 
 onMounted(() => {
   map = new BMapGL.Map("container");
@@ -122,18 +123,23 @@ function draw() {
 }
 
 function save() {
-  if (currentOverlay) {
+  if (currentOverlay.value) {
     console.log("保存");
-    console.log(currentOverlay.getPath());
-    overlayList.push(currentOverlay);
-    map.removeOverlay(currentOverlay);
-    currentOverlay = null;
+    console.log(currentOverlay.value.getPath());
+    overlayList.value.push(currentOverlay.value);
+    map.removeOverlay(currentOverlay.value);
+
+    var polygon = new BMapGL.Polygon(currentOverlay.value.getPath(), {strokeColor:"red", strokeWeight:2, strokeOpacity:0.5});
+    map.addOverlay(polygon);  
+
+    currentOverlay.value = null;
   }
   drawingManager.close();
 }
 
 function overlaycomplete(e) {
-  currentOverlay = e.overlay;
+  currentOverlay.value
+   = e.overlay;
 }
 </script>
 <style scoped>
