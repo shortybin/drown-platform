@@ -39,11 +39,15 @@ import { onMounted, ref } from "vue";
 const hazardLevelOptions = [
   {
     value: 1,
-    label: 1,
+    label: '低',
   },
   {
     value: 2,
-    label: 2,
+    label: '中',
+  },
+  {
+    value: 3,
+    label: '高',
   },
 ];
 
@@ -90,7 +94,7 @@ onMounted(() => {
   var point = new BMapGL.Point(110.989311, 35.610962);
   map.centerAndZoom(point, 15);
   map.enableScrollWheelZoom(true);
-  map.setMapType(BMAP_NORMAL_MAP); //地图模式
+  map.setMapType(BMAP_SATELLITE_MAP); //地图模式
 
   drawingManager = new BMapGLLib.DrawingManager(map, {
     // isOpen: true,        // 是否开启绘制模式

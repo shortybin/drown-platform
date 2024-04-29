@@ -15,18 +15,34 @@ const redOuterOverlay = {
   fillOpacity: 0.2,
 };
 const yellowInnerOverlay = {
-  strokeColor: "yellow",
+  strokeColor: "#FF8C00",
   strokeWeight: 2,
   strokeOpacity: 0.8,
-  fillColor: "yellow",
+  fillColor: "#FF8C00",
   fillOpacity: 0.6,
 };
 
 const yellowOuterOverlay = {
-  strokeColor: "yellow",
+  strokeColor: "#FF8C00",
   strokeWeight: 2,
   strokeOpacity: 0.4,
-  fillColor: "yellow",
+  fillColor: "#FF8C00",
+  fillOpacity: 0.2,
+};
+
+const blueInnerOverlay = {
+  strokeColor: "#8B3A3A",
+  strokeWeight: 2,
+  strokeOpacity: 0.8,
+  fillColor: "#8B3A3A",
+  fillOpacity: 0.6,
+};
+
+const blueOuterOverlay = {
+  strokeColor: "#8B3A3A",
+  strokeWeight: 2,
+  strokeOpacity: 0.4,
+  fillColor: "#8B3A3A",
   fillOpacity: 0.2,
 };
 
@@ -34,9 +50,9 @@ export function addOverlay(map, data, callback) {
   let polygonOption = null;
   if (data.fence_level === 1) {
     if (data.inner_or_outer === 1) {
-      polygonOption = redInnerOverlay;
+      polygonOption = blueInnerOverlay;
     } else if (data.inner_or_outer === 2) {
-      polygonOption = redOuterOverlay;
+      polygonOption = blueOuterOverlay;
     }
   } else if (data.fence_level === 2) {
     if (data.inner_or_outer === 1) {
@@ -44,12 +60,20 @@ export function addOverlay(map, data, callback) {
     } else if (data.inner_or_outer === 2) {
       polygonOption = yellowOuterOverlay;
     }
+  } else if (data.fence_level === 3) {
+    if (data.inner_or_outer === 1) {
+      polygonOption = redInnerOverlay;
+    } else if (data.inner_or_outer === 2) {
+      polygonOption = redOuterOverlay;
+    }
   }
 
   let polygon = new BMapGL.Polygon(data.vertexes, polygonOption);
-  polygon.addEventListener("click", (event) => {
-    callback(data, polygon);
-  });
+  if (callback) {
+    polygon.addEventListener("click", (event) => {
+      callback(data, polygon);
+    });
+  }
   map.addOverlay(polygon);
 }
 
